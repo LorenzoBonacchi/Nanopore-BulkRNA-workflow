@@ -1,0 +1,100 @@
+############################
+# RAW NGS DATA (IMPORTANT)
+############################
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.sam
+*.cram
+*.bai
+*.crai
+*.vcf
+*.vcf.gz
+*.bcf
+
+############################
+# GENOME INDEXES / DB
+############################
+*.fai
+*.dict
+*.bt2
+*.bwt
+*.pac
+*.ann
+*.amb
+*.sa
+
+############################
+# LARGE OUTPUT DIRECTORIES
+############################
+results/
+output/
+out/
+tmp/
+temp/
+logs/
+work/
+scratch/
+
+############################
+# PIPELINES (Snakemake / Nextflow)
+############################
+.snakemake/
+.nextflow*
+workdir/
+dag.svg
+
+############################
+# CONDA / ENVIRONMENTS
+############################
+.env
+.venv/
+venv/
+conda-env/
+*.conda
+*.mamba
+
+############################
+# PYTHON
+############################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+*.egg-info/
+
+############################
+# R / BIOCONDUCTOR
+############################
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+############################
+# JUPYTER
+############################
+.ipynb_checkpoints/
+
+############################
+# SYSTEM FILES
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# HPC / CLUSTER
+############################
+*.o
+*.e
+slurm-*.out
+
+############################
+# IDE
+############################
+.vscode/
+.idea/
+*.swp
