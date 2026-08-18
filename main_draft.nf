@@ -39,9 +39,11 @@ include { runConcatenateFastq } from 'modules/ConcatenateFastq.nf'
 include { runNanoPlotQC_pre } from 'modules/NanoPlotQC.nf'
 include { runNanoPlotQC_post } from 'modules/NanoPlotQC.nf'
 include { runFastCat } from 'modules/FastCat_filtering.nf'  
+include { runPychopper } from 'modules/Pychopper.nf'  
 
 workflow {
-    samplesheet_ch = Channel.fromPath(params.samplesheet) // Reading CSV
+    fastq_ch = channel.fromPath("${params.fastq_dir}/*.fastq.gz") // Reading fastq files but I should check with view() if the files are correctly read
+    samplesheet_ch = channel.fromPath(params.samplesheet) // Reading CSV
     readSamplesheet(samplesheet_ch)
     
     // Parsing del CSV
@@ -52,10 +54,11 @@ workflow {
         .set { barcode_ch }
 
     // Concatenate fastq
-    runConcatenateFastq(barcode_ch)
+    runConcatenateFastq(fastq_ch)
     runNanoPlotQC_pre(runConcatenateFastq.out) // QC before filtering
     runFastCat(runConcatenateFastq.out)
     runNanoPlotQC_post(runFastCat.out) //di nuovo per il QC dopo il filtering
+    runPychopper(runFastCat.out)
 }
 
 
