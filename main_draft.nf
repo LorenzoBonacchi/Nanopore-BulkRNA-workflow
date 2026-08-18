@@ -1,37 +1,26 @@
-# --------------------------------------------- #
-# Nextflow workflow for Bulk RNA-seq analysis using Nanopore data
-# --------------------------------------------- #
+// --------------------------------------------- //
+// Nextflow workflow for Bulk RNA-seq analysis using Nanopore data
+// --------------------------------------------- //
 
-/*
- * Pipeline parameters
- */
+// Pipeline parameters
+
 params.samplesheet = 'samplesheet.csv'
+params.fastq_dir = '/path/to/fastq_pass' // Directory containing the fastq files
 
-
-# --------------------------------------------- #
-# Processes
-# --------------------------------------------- #
+// --------------------------------------------- //
+// Processes
+// --------------------------------------------- //
 process readSamplesheet {
-    publishDir 'results', mode: 'copy'
     input:
-        val samplesheet
+    path samplesheet
     output:
-        path "${samplesheet}-barcode.txt"
+    path 'samplesheet_check.txt'
 
     script:
     """
-    echo '$samplesheet' > '$samplesheet-barcode.txt'
+    echo "Samplesheet:"
+    cat ${samplesheet} > samplesheet_check.txt
     """
-}
-
-process runConcatenateFastq {
-    publishDir 'results', mode: 'copy'
-    input:
-        val barcode
-    output:
-        ????
-    echo "Processing $barcode:"
-    zcat /path/to/fastq_pass/barcode${barcode}*.fastq.gz > barcode_${barcode}_veh_combined.fastq
 }
 
 // samplesheet example 
@@ -41,18 +30,41 @@ process runConcatenateFastq {
 //  3,barcode_03,veh
 //  ecc.
 
-# --------------------------------------------- #
-# Workflow
-# --------------------------------------------- #
+
+// --------------------------------------------- //
+// Workflow
+// --------------------------------------------- //
+
+include { runConcatenateFastq } from 'modules/ConcatenateFastq.nf'
+include { runNanoPlotQC_pre } from 'modules/NanoPlotQC.nf'
+include { runNanoPlotQC_post } from 'modules/NanoPlotQC.nf'
+include { runFastCat } from 'modules/FastCat_filtering.nf'  
 
 workflow {
-    samplesheet_ch = Channel.fromPath(params.samplesheet) #fromPath is used to read csv
-    // emit a greeting
-    readSamplesheet(samplesheet_ch).splitCsv(header:true)
-    .map { row -> row.barcode } //row -> row[1] in the example
-    .view()
+    samplesheet_ch = Channel.fromPath(params.samplesheet) // Reading CSV
+    readSamplesheet(samplesheet_ch)
+    
+    // Parsing del CSV
+    samplesheet_ch
+        .splitCsv(header: true)
+        .map { row -> tuple(row.barcode, row.condition) }
+        .view()
+        .set { barcode_ch }
 
-    // Concatenate fastq files for each barcode 
-    runConcatenateFastq(readSamplesheet.out)
+    // Concatenate fastq
+    runConcatenateFastq(barcode_ch)
+    runNanoPlotQC_pre(runConcatenateFastq.out) // QC before filtering
+    runFastCat(runConcatenateFastq.out)
+    runNanoPlotQC_post(runFastCat.out) //di nuovo per il QC dopo il filtering
 }
+
+
+// CLI final command to run the workflow
+// nextflow run main.nf --samplesheet samplesheet.csv --fastq_dir /data/fastq_pass
+
+
+
+
+
+
 
