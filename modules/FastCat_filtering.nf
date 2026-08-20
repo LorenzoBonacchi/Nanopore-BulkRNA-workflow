@@ -6,11 +6,16 @@
 process runFastCat {
     input:
     tuple val(barcode), val(condition), path(fastq)
+
     output:
-    tuple val(barcode), val(condition), path("${barcode}_${condition}_filtered.fastq")
+    tuple val(barcode), val(condition), path("filtered")
 
     script:
     """
-    fastcat -i ${fastq} -o ${barcode}_${condition}_filtered.fastq
+    fastcat fastq \
+        --min-qscore 10 \
+        --min-length 200 \
+        -o filtered \
+        ${fastq}
     """
 }

@@ -34,32 +34,38 @@ process readSamplesheet {
 // --------------------------------------------- //
 // Workflow
 // --------------------------------------------- //
-
-include { runConcatenateFastq } from 'modules/ConcatenateFastq.nf'
-include { runNanoPlotQC_pre } from 'modules/NanoPlotQC.nf'
-include { runNanoPlotQC_post } from 'modules/NanoPlotQC.nf'
-include { runFastCat } from 'modules/FastCat_filtering.nf'  
-include { runPychopper } from 'modules/Pychopper.nf'  
+include { runConcatenateFastq } from './modules/ConcatenateFastq.nf'
+include { runNanoPlotQC_pre } from './modules/NanoPlotQC.nf'
+include { runNanoPlotQC_post } from './modules/NanoPlotQC.nf'
+include { runFastCat } from './modules/FastCat_filtering.nf'  
+include { runPychopper } from './modules/Pychopper.nf'  
 
 workflow {
-    fastq_ch = channel.fromPath("${params.fastq_dir}/*.fastq.gz") // Reading fastq files but I should check with view() if the files are correctly read
-    samplesheet_ch = channel.fromPath(params.samplesheet) // Reading CSV
+    samplesheet_ch = channel.fromPath(params.samplesheet)
     readSamplesheet(samplesheet_ch)
-    
-    // Parsing del CSV
     samplesheet_ch
         .splitCsv(header: true)
-        .map { row -> tuple(row.barcode, row.condition) }
-        .view()
-        .set { barcode_ch }
+        .map { row ->
+            tuple(
+                row.barcode,
+                row.condition,
+                file("${params.fastq_dir}/${row.barcode}/*.fastq.gz", checkIfExists: true)
+            )
+        }
+        .view { "INPUT: $it" }
+        .set { fastq_ch }
 
-    // Concatenate fastq
     runConcatenateFastq(fastq_ch)
-    runNanoPlotQC_pre(runConcatenateFastq.out) // QC before filtering
+    runNanoPlotQC_pre(runConcatenateFastq.out)
     runFastCat(runConcatenateFastq.out)
-    runNanoPlotQC_post(runFastCat.out) //di nuovo per il QC dopo il filtering
+    runNanoPlotQC_post(runFastCat.out)
     runPychopper(runFastCat.out)
 }
+
+// CLI final command to run the workflow
+// nextflow run main.nf --samplesheet samplesheet.csv --fastq_dir /data/fastq_pass
+
+
 
 
 // CLI final command to run the workflow
