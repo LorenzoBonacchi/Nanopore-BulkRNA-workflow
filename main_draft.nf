@@ -6,6 +6,7 @@
 
 params.samplesheet = 'samplesheet.csv'
 params.fastq_dir = '/path/to/fastq_pass' // Directory containing the fastq files
+params.reference_genome = '/home/lab-user/reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa'
 
 // --------------------------------------------- //
 // Processes
@@ -39,6 +40,11 @@ include { runNanoPlotQC_pre } from './modules/NanoPlotQC.nf'
 include { runNanoPlotQC_post } from './modules/NanoPlotQC.nf'
 include { runFastCat } from './modules/FastCat_filtering.nf'  
 include { runPychopper } from './modules/Pychopper.nf'  
+include { runMinimap2 } from './modules/Minimap2.nf'
+include { runSamtoBam } from './modules/Samtools.nf'
+include { runSortBam } from './modules/Samtools.nf' 
+include { runBamIndex } from './modules/Samtools.nf'    
+
 
 workflow {
     samplesheet_ch = channel.fromPath(params.samplesheet)
@@ -60,16 +66,16 @@ workflow {
     runFastCat(runConcatenateFastq.out)
     runNanoPlotQC_post(runFastCat.out)
     runPychopper(runFastCat.out)
+    runMinimap2(runPychopper.out)
+    runSamtoBam(runMinimap2.out)
+    runSortBam(runSamtoBam.out)
+    runBamIndex(runSortBam.out)
 }
 
 // CLI final command to run the workflow
 // nextflow run main.nf --samplesheet samplesheet.csv --fastq_dir /data/fastq_pass
 
 
-
-
-// CLI final command to run the workflow
-// nextflow run main.nf --samplesheet samplesheet.csv --fastq_dir /data/fastq_pass
 
 
 
