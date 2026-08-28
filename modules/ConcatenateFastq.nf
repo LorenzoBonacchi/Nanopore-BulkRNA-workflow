@@ -5,13 +5,20 @@
 // Assuming is requiried to unzip files before concatenation, the process will use zcat to concatenate the fastq files.
 
 process runConcatenateFastq {
+    tag "${barcode}_${condition}"
+
+    publishDir "${params.outdir}/concatenate/${barcode}_${condition}",
+        mode: 'copy',
+        overwrite: true
+
     input:
     tuple val(barcode), val(condition), path(fastq_files)
     output:
-    tuple val(barcode), val(condition), path("${barcode}_${condition}_combined.fastq")
-    
+    tuple val(barcode), val(condition),
+          path("${barcode}_${condition}_combined.fastq")
+
     script:
     """
-    zcat ${fastq_files} > ${barcode}_${condition}_combined.fastq 
+    zcat ${fastq_files} > ${barcode}_${condition}_combined.fastq
     """
 }

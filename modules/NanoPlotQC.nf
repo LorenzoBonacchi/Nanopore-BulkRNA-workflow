@@ -5,6 +5,11 @@
 // I'm working on providing a single summary report for all barcodes and conditions, but for now, the output will be separate for each barcode and condition.
 
 process runNanoPlotQC_pre {
+    tag "${barcode}_${condition}"
+    publishDir "${params.outdir}/nanoplot_pre/${barcode}_${condition}",
+        mode: 'copy',
+        overwrite: true
+
     input:
     tuple val(barcode), val(condition), path(fastq)
     output:
@@ -12,13 +17,21 @@ process runNanoPlotQC_pre {
 
     script:
     """
-    NanoPlot -t 30 --fastq ${fastq} --outdir Nanoplot_${barcode}_${condition}
+    NanoPlot \
+        -t 30 \
+        --fastq ${fastq} \
+        --outdir Nanoplot_${barcode}_${condition}
     """
 }
 
 
 
 process runNanoPlotQC_post {
+    tag "${barcode}_${condition}"
+    publishDir "${params.outdir}/nanoplot_post/${barcode}_${condition}",
+        mode: 'copy',
+        overwrite: true
+
     input:
     tuple val(barcode), val(condition), path(fastq)
     output:
@@ -26,6 +39,9 @@ process runNanoPlotQC_post {
 
     script:
     """
-    NanoPlot -t 30 --fastq ${fastq} --outdir Nanoplot_${barcode}_${condition}_filtered
+    NanoPlot \
+        -t 30 \
+        --fastq ${fastq} \
+        --outdir Nanoplot_${barcode}_${condition}_filtered
     """
 }

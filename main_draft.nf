@@ -7,6 +7,7 @@
 params.samplesheet = 'samplesheet.csv'
 params.fastq_dir = '/path/to/fastq_pass' // Directory containing the fastq files
 params.reference_genome = '/home/lab-user/reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa'
+params.outdir = 'results'
 
 // --------------------------------------------- //
 // Processes
@@ -30,7 +31,6 @@ process readSamplesheet {
 //  2,barcode_02,veh
 //  3,barcode_03,veh
 //  ecc.
-
 
 // --------------------------------------------- //
 // Workflow
@@ -64,9 +64,9 @@ workflow {
     runConcatenateFastq(fastq_ch)
     runNanoPlotQC_pre(runConcatenateFastq.out)
     runFastCat(runConcatenateFastq.out)
-    runNanoPlotQC_post(runFastCat.out)
-    runPychopper(runFastCat.out)
-    runMinimap2(runPychopper.out)
+    runNanoPlotQC_post(runFastCat.out.filtered_fastq)
+    runPychopper(runFastCat.out.filtered_fastq)
+    runMinimap2(runPychopper.out.full_length)
     runSamtoBam(runMinimap2.out)
     runSortBam(runSamtoBam.out)
     runBamIndex(runSortBam.out)

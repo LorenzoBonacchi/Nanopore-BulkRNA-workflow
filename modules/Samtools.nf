@@ -4,23 +4,30 @@
 
 
 process runSamtoBam {
-    input:
-    tuple val(barcode), val(condition), path(fastq)
-    output:
-    tuple val(barcode), val(condition), path("barcode_${barcode}_${condition}_aln.bam")
+    tag "${barcode}_${condition}"
+    publishDir "${params.outdir}/samtools_view/${barcode}_${condition}",
+        mode: 'copy',
+        overwrite: true
 
+    input:
+    tuple val(barcode), val(condition), path(sam)
+    output:
+    tuple val(barcode), val(condition),
+          path("barcode_${barcode}_${condition}_aln.bam")
     script:
     """
-    echo "Starting Samtools conversion"
-    echo "Converting $barcode SAM to BAM:"
-    samtools view -bS barcode_${barcode}_${condition}_aln.sam > barcode_${barcode}_${condition}_aln.bam
+    echo "Converting ${barcode} (${condition}) SAM to BAM"
+    samtools view \
+        -b \
+        ${sam} \
+        > barcode_${barcode}_${condition}_aln.bam
     """
 }
 
 
 process runSortBam {
     input:
-    tuple val(barcode), val(condition), path(fastq)
+    tuple val(barcode), val(condition), path(bam)
     output:
     tuple val(barcode), val(condition), path("barcode_${barcode}_${condition}_aln_sorted.bam")
 
@@ -28,21 +35,27 @@ process runSortBam {
     """
     echo "Starting Samtools conversion"
     echo "Converting $barcode SAM to BAM:"
-    samtools sort barcode_${barcode}_${condition}_aln.bam -o barcode_${barcode}_${condition}_aln_sorted.bam
+    samtools sort $bam -o barcode_${barcode}_${condition}_aln_sorted.bam
     """
 }
 
 
 process runBamIndex {
+    tag "${barcode}_${condition}"
+    publishDir "${params.outdir}/bam/${barcode}_${condition}",
+        mode: 'copy',
+        overwrite: true
+
     input:
-    tuple val(barcode), val(condition), path(fastq)
+    tuple val(barcode), val(condition), path(bam)
     output:
-    tuple val(barcode), val(condition), path("barcode_${barcode}_${condition}_aln_sorted.bam")
+    tuple val(barcode), val(condition),
+          path(bam),
+          path("${bam}.bai")
 
     script:
     """
-    echo "Starting Samtools conversion"
-    echo "Converting $barcode SAM to BAM:"
-    samtools index barcode_${barcode}_${condition}_aln_sorted.bam
+    echo "Indexing ${barcode} (${condition}) BAM"
+    samtools index ${bam}
     """
 }
