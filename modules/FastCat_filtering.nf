@@ -4,24 +4,29 @@
 
 
 process runFastCat {
-    tag "${barcode}_${condition}"
 
-    publishDir "${params.outdir}/fastcat/${barcode}_${condition}",
+    tag "${barcode}_${condition}"
+    publishDir "${params.outdir}/fastcat",
         mode: 'copy',
-        overwrite: true
+        overwrite: true,
+        saveAs: { filename ->
+            "${barcode}_${condition}/${filename}"
+        }
 
     input:
     tuple val(barcode), val(condition), path(fastq)
     output:
-    tuple val(barcode), val(condition), path("filtered/*.fastq"), emit: filtered_fastq
+    tuple val(barcode), val(condition),
+          path("${barcode}_${condition}_filtered.fastq"),
+          emit: filtered
 
     script:
     """
-    mkdir -p filtered
     fastcat fastq \
         --min-qscore 10 \
         --min-length 200 \
-        -o filtered \
-        ${fastq}
+        -o fastcat_qc \
+        ${fastq} \
+        > ${barcode}_${condition}_filtered.fastq
     """
 }

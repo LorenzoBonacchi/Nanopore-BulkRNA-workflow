@@ -6,10 +6,12 @@
 
 process runConcatenateFastq {
     tag "${barcode}_${condition}"
-
-    publishDir "${params.outdir}/concatenate/${barcode}_${condition}",
+    publishDir "${params.outdir}/concatenate",
         mode: 'copy',
-        overwrite: true
+        overwrite: true,
+        saveAs: { filename ->
+            "${barcode}_${condition}/${filename}"
+        }
 
     input:
     tuple val(barcode), val(condition), path(fastq_files)

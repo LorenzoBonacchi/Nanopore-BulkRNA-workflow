@@ -5,9 +5,9 @@
 
 process runSamtoBam {
     tag "${barcode}_${condition}"
-    publishDir "${params.outdir}/samtools_view/${barcode}_${condition}",
-        mode: 'copy',
-        overwrite: true
+    //publishDir "${params.outdir}/samtools_view/${barcode}_${condition}",
+    //    mode: 'copy',
+    //    overwrite: true
 
     input:
     tuple val(barcode), val(condition), path(sam)
@@ -42,9 +42,9 @@ process runSortBam {
 
 process runBamIndex {
     tag "${barcode}_${condition}"
-    publishDir "${params.outdir}/bam/${barcode}_${condition}",
-        mode: 'copy',
-        overwrite: true
+    //publishDir "${params.outdir}/bam/${barcode}_${condition}",
+    //    mode: 'copy',
+    //    overwrite: true
 
     input:
     tuple val(barcode), val(condition), path(bam)

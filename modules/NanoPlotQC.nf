@@ -6,9 +6,12 @@
 
 process runNanoPlotQC_pre {
     tag "${barcode}_${condition}"
-    publishDir "${params.outdir}/nanoplot_pre/${barcode}_${condition}",
+    publishDir "${params.outdir}/nanoplot_pre",
         mode: 'copy',
-        overwrite: true
+        overwrite: true,
+        saveAs: { filename ->
+            "${barcode}_${condition}/${filename}"
+        }
 
     input:
     tuple val(barcode), val(condition), path(fastq)
@@ -25,12 +28,14 @@ process runNanoPlotQC_pre {
 }
 
 
-
 process runNanoPlotQC_post {
     tag "${barcode}_${condition}"
-    publishDir "${params.outdir}/nanoplot_post/${barcode}_${condition}",
+    publishDir "${params.outdir}/nanoplot_post",
         mode: 'copy',
-        overwrite: true
+        overwrite: true,
+        saveAs: { filename ->
+            "${barcode}_${condition}/${filename}"
+        }
 
     input:
     tuple val(barcode), val(condition), path(fastq)
