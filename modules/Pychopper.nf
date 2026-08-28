@@ -5,22 +5,19 @@
 
 process runPychopper {
     tag "${barcode}_${condition}"
-    //publishDir "${params.outdir}/pychopper/${barcode}_${condition}",
-    //    mode: 'copy',
-    //    overwrite: true
 
     input:
     tuple val(barcode), val(condition), path(fastq)
     output:
-    tuple val(barcode), val(condition),
-          path("${barcode}_${condition}_full_length.fastq"),
-          emit: full_length
     tuple val(barcode), val(condition),
           path("${barcode}_${condition}_pychopper_report.txt"),
           emit: report
     tuple val(barcode), val(condition),
           path("${barcode}_${condition}_unclassified.fastq"),
           emit: unclassified
+    tuple val(barcode), val(condition),
+          path("${barcode}_${condition}_full_length.fastq"),
+          emit: full_length
 
     script:
     """
