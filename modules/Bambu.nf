@@ -4,6 +4,7 @@
 // The output will be a directory named "bambu_output" containing the Bambu results for each barcode and condition.
 
 process runBambu {
+    conda "${projectDir}/envs/bambu_env.yml"
     tag "${barcode}_${condition}"
 
     cpus params.bambu_threads
