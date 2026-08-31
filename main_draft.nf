@@ -3,11 +3,7 @@
 // --------------------------------------------- //
 
 // Pipeline parameters
-
-params.samplesheet = 'samplesheet.csv'
-params.fastq_dir = '/home/lab-user/Scrivania/dermatite/fastq_pass/' // Directory containing the fastq files
-params.reference_genome = '/home/lab-user/reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa' // Reference genome file
-params.outdir = 'results'
+// The parameters are defined in the nextflow.config file, which is located in the root directory of the workflow.
 
 // --------------------------------------------- //
 // Processes

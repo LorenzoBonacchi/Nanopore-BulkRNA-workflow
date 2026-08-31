@@ -29,7 +29,7 @@ process runPychopper {
     """
     echo "Processing ${barcode} (${condition})"
     pychopper \
-        -t 18 \
+        -t ${params.default_threads} \
         -r ${barcode}_${condition}_pychopper_report.txt \
         -u ${barcode}_${condition}_unclassified.fastq \
         ${fastq} \

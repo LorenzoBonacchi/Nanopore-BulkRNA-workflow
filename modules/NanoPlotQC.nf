@@ -21,7 +21,7 @@ process runNanoPlotQC_pre {
     script:
     """
     NanoPlot \
-        -t 30 \
+        -t ${params.default_threads} \
         --fastq ${fastq} \
         --outdir Nanoplot_${barcode}_${condition}
     """
@@ -45,7 +45,7 @@ process runNanoPlotQC_post {
     script:
     """
     NanoPlot \
-        -t 30 \
+        -t ${params.default_threads} \
         --fastq ${fastq} \
         --outdir Nanoplot_${barcode}_${condition}_filtered
     """

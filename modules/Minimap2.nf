@@ -23,7 +23,7 @@ process runMinimap2 {
     echo "Starting Minimap2 alignment"
     echo "Aligning ${barcode} (${condition})"
     minimap2 \
-        -t 60 \
+        -t ${params.default_threads} \
         -a \
         -x splice \
         ${params.reference_genome} \
