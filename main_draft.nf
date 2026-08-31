@@ -40,7 +40,7 @@ include { runMinimap2 } from './modules/Minimap2.nf'
 include { runSamtoBam } from './modules/Samtools.nf'
 include { runSortBam } from './modules/Samtools.nf' 
 include { runBamIndex } from './modules/Samtools.nf'    
-
+include { runBambu } from './modules/Bambu.nf'
 
 workflow {
     samplesheet_ch = channel.fromPath(params.samplesheet)
@@ -67,6 +67,8 @@ workflow {
     runSamtoBam(runMinimap2.out)
     runSortBam(runSamtoBam.out)
     runBamIndex(runSortBam.out)
+    runBambu(
+    runBamIndex.out.collect(), file(params.reference_genome), file(params.annotation_gtf))
 }
 
 // CLI final command to run the workflow
