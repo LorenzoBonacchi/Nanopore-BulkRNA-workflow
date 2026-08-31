@@ -5,9 +5,12 @@
 
 process runSamtoBam {
     tag "${barcode}_${condition}"
-    //publishDir "${params.outdir}/samtools_view/${barcode}_${condition}",
-    //    mode: 'copy',
-    //    overwrite: true
+    publishDir "${params.outdir}/sams",
+        mode: 'copy',
+        overwrite: true,
+        saveAs: { filename ->
+            "${barcode}_${condition}/${filename}"
+        }
 
     input:
     tuple val(barcode), val(condition), path(sam)
@@ -42,10 +45,12 @@ process runSortBam {
 
 process runBamIndex {
     tag "${barcode}_${condition}"
-    //publishDir "${params.outdir}/bam/${barcode}_${condition}",
-    //    mode: 'copy',
-    //    overwrite: true
-
+    publishDir "${params.outdir}/bams",
+        mode: 'copy',
+        overwrite: true,
+        saveAs: { filename ->
+            "${barcode}_${condition}/${filename}"
+        }
     input:
     tuple val(barcode), val(condition), path(bam)
     output:
