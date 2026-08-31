@@ -54,7 +54,8 @@ workflow {
                 file("${params.fastq_dir}/${row.barcode}/*.fastq.gz", checkIfExists: true)
             )
         }
-        .view { "INPUT: $it" }
+        .view { barcode, condition, fastq_files -> "INPUT: ${barcode} | condition: ${condition} | FASTQ files: ${fastq_files.size()}"
+        }
         .set { fastq_ch }
 
     runConcatenateFastq(fastq_ch)
