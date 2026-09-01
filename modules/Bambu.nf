@@ -3,15 +3,19 @@
 // This process runs Bambu on the sorted and indexed BAM files produced by the previous steps of the workflow. 
 // The output will be a directory named "bambu_output" containing the Bambu results for each barcode and condition.
 
-process runBambu {
+
+ process runBambu {
+
+    tag "Bambu_quantification"
+
     conda "${projectDir}/envs/bambu_env.yml"
-    tag "${barcode}_${condition}"
 
     cpus params.bambu_threads
-    publishDir "${params.outdir}/bambu/${barcode}", mode: 'copy'
+
+    publishDir "${params.outdir}/bambu", mode: 'copy'
 
     input:
-    tuple val(barcode), val(condition), path(bam), path(bai)
+    path bams
     path reference_genome
     path annotation_gtf
 
@@ -19,6 +23,7 @@ process runBambu {
     path "bambu_output/*"
 
     script:
+
     """
     mkdir -p bambu_output
 
@@ -27,32 +32,48 @@ process runBambu {
     library(bambu)
 
     message("========================================")
-    message("Bambu")
-    message("Sample: ${barcode}")
-    message("Condition: ${condition}")
-    message("BAM: ${bam}")
-    message("GTF: ${annotation_gtf}")
-    message("Genome: ${reference_genome}")
+    message("Bambu quantification")
     message("========================================")
 
     annotations <- prepareAnnotations(
         "${annotation_gtf}"
     )
 
+    bam_files <- c(
+        ${bams.collect { "\"${it}\"" }.join(",\n        ")}
+    )
+
+    message("BAM files:")
+    message(paste(bam_files, collapse = "\\n"))
+
+    message("GTF: ${annotation_gtf}")
+    message("Genome: ${reference_genome}")
+
+    message("Discovery: FALSE")
+    message("Quantification: TRUE")
+    message("Low memory: ${params.bambu_low_memory}")
+    message("Threads: ${task.cpus}")
+
+    message("========================================")
+
     se <- bambu(
-        reads = "${bam}",
+        reads = bam_files,
         annotations = annotations,
         genome = "${reference_genome}",
-        discovery = ${params.bambu_discovery},
-        quant = ${params.bambu_quant},
-        lowMemory = ${params.bambu_low_memory}
+        discovery = FALSE,
+        quant = TRUE,
+        lowMemory = ${params.bambu_low_memory ? 'TRUE' : 'FALSE'},
+        ncore = ${task.cpus}
     )
 
     writeBambuOutput(
         se,
-        path = "bambu_output",
-        prefix = "${barcode}"
+        path = "bambu_output"
     )
+
+    message("========================================")
+    message("Bambu completed successfully")
+    message("========================================")
 
     RSCRIPT
     """

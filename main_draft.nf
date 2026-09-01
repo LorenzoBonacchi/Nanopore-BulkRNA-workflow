@@ -47,8 +47,7 @@ workflow {
         .view { barcode, condition, fastq_files -> "INPUT: ${barcode} | condition: ${condition} | FASTQ files: ${fastq_files.size()}"
         }
         .set { fastq_ch }
-
-    readSamplesheet(samplesheet_ch) 
+ 
     runConcatenateFastq(fastq_ch)
     runNanoPlotQC_pre(runConcatenateFastq.out)
     runFastCat(runConcatenateFastq.out)
@@ -58,7 +57,8 @@ workflow {
     runSamtoBam(runMinimap2.out)
     runSortBam(runSamtoBam.out)
     runBamIndex(runSortBam.out)
-    runBambu(runBamIndex.out.collect(), file(params.reference_genome), file(params.annotation_gtf))
+	bam_ch = runBamIndex.out.map { barcode, condition, bam, bai -> bam }.collect()
+    runBambu(bam_ch, file(params.reference_genome), file(params.annotation_file))
 }
 
 // CLI final command to run the workflow
