@@ -8,18 +8,7 @@
 // --------------------------------------------- //
 // Processes
 // --------------------------------------------- //
-process readSamplesheet {
-    input:
-    path samplesheet
-    output:
-    path 'samplesheet_check.txt'
 
-    script:
-    """
-    echo "Samplesheet:"
-    cat ${samplesheet} > samplesheet_check.txt
-    """
-}
 
 // samplesheet example 
 // sample,barcode,condition
@@ -31,6 +20,7 @@ process readSamplesheet {
 // --------------------------------------------- //
 // Workflow
 // --------------------------------------------- //
+include { readSamplesheet } from './modules/ReadSamplesheet.nf'
 include { runConcatenateFastq } from './modules/ConcatenateFastq.nf'
 include { runNanoPlotQC_pre } from './modules/NanoPlotQC.nf'
 include { runNanoPlotQC_post } from './modules/NanoPlotQC.nf'
@@ -58,6 +48,7 @@ workflow {
         }
         .set { fastq_ch }
 
+    readSamplesheet(samplesheet_ch) 
     runConcatenateFastq(fastq_ch)
     runNanoPlotQC_pre(runConcatenateFastq.out)
     runFastCat(runConcatenateFastq.out)
@@ -67,8 +58,7 @@ workflow {
     runSamtoBam(runMinimap2.out)
     runSortBam(runSamtoBam.out)
     runBamIndex(runSortBam.out)
-    runBambu(
-    runBamIndex.out.collect(), file(params.reference_genome), file(params.annotation_gtf))
+    runBambu(runBamIndex.out.collect(), file(params.reference_genome), file(params.annotation_gtf))
 }
 
 // CLI final command to run the workflow
