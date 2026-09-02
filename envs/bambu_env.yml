@@ -8,3 +8,4 @@ dependencies:
   - r-base=4.5
   - r-biocmanager
   - bioconductor-bambu=3.12.1
+  - bioconductor-biocfilecache
