@@ -5,12 +5,12 @@
 
 process runPychopper {
     tag "${barcode}_${condition}"
-    publishDir "${params.outdir}/pychopper",
-        mode: 'copy',
-        overwrite: true,
-        saveAs: { filename ->
-            "${barcode}_${condition}/${filename}"
-        }
+    // publishDir "${params.outdir}/pychopper",
+    //    mode: 'copy',
+    //    overwrite: true,
+    //    saveAs: { filename ->
+    //        "${barcode}_${condition}/${filename}"
+    //    }
 
     input:
     tuple val(barcode), val(condition), path(fastq)

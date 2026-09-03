@@ -5,12 +5,12 @@
 
 process runMinimap2 {
     tag "${barcode}_${condition}"
-    publishDir "${params.outdir}/minimap2",
-        mode: 'copy',
-        overwrite: true,
-        saveAs: { filename ->
-            "${barcode}_${condition}/${filename}"
-        }
+    // publishDir "${params.outdir}/minimap2",
+    //    mode: 'copy',
+    //    overwrite: true,
+    //    saveAs: { filename ->
+    //        "${barcode}_${condition}/${filename}"
+    //    }
 
     input:
     tuple val(barcode), val(condition), path(fastq)
