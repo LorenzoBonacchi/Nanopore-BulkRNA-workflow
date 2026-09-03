@@ -24,6 +24,7 @@ include { readSamplesheet } from './modules/ReadSamplesheet.nf'
 include { runConcatenateFastq } from './modules/ConcatenateFastq.nf'
 include { runNanoPlotQC_pre } from './modules/NanoPlotQC.nf'
 include { runNanoPlotQC_post } from './modules/NanoPlotQC.nf'
+include { aggregateNanoPlotQC } from './modules/aggregateNanoPlot.nf'
 include { runFastCat } from './modules/FastCat_filtering.nf'  
 include { runPychopper } from './modules/Pychopper.nf'  
 include { runMinimap2 } from './modules/Minimap2.nf'
@@ -52,6 +53,7 @@ workflow {
     runNanoPlotQC_pre(runConcatenateFastq.out)
     runFastCat(runConcatenateFastq.out)
     runNanoPlotQC_post(runFastCat.out.filtered)
+    aggregateNanoPlotQC(runNanoPlotQC_pre.out.collect(), runNanoPlotQC_post.out.collect())
     runPychopper(runFastCat.out.filtered)
     runMinimap2(runPychopper.out.full_length)
     runSamtoBam(runMinimap2.out)
