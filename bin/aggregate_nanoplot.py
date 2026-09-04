@@ -14,14 +14,11 @@ def parse_nanostats(stats_file, stage):
     """
 
     values = {}
-
     with open(stats_file, "r") as f:
         for line in f:
             line = line.strip()
-
             if not line:
                 continue
-            
             # Lines such as:
             # Mean read length: 858.8
             # Number of reads: 16,476,351.0
@@ -38,21 +35,15 @@ def parse_nanostats(stats_file, stage):
 
                 values[key] = value
 
-    # Recover barcode_condition from parent directory
-    nanoplot_dir = stats_file.parent.name
-
-    # Nanoplot_barcode01_veh
+    nanoplot_dir = stats_file.parent.name # Recover barcode_condition from parent directory
     prefix = "Nanoplot_"
     sample_name = nanoplot_dir
 
     if sample_name.startswith(prefix):
         sample_name = sample_name[len(prefix):]
 
-    # Remove "_filtered" from post-NanoPlot directory
+    
     sample_name = sample_name.replace("_filtered", "")
-
-    # Split barcode and condition.
-    # Expected structure: barcode01_veh
     parts = sample_name.split("_", 1)
 
     if len(parts) == 2:
@@ -82,10 +73,8 @@ def find_nanostats(paths, stage):
     """
 
     records = []
-
     for path in paths:
         path = Path(path)
-
         if path.is_dir():
             stats_files = path.rglob("NanoStats.txt")
         elif path.name == "NanoStats.txt":
@@ -95,16 +84,13 @@ def find_nanostats(paths, stage):
 
         for stats_file in stats_files:
             records.append(parse_nanostats(stats_file, stage))
-
     return records
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="Aggregate NanoPlot NanoStats.txt files"
     )
-
     parser.add_argument(
         "--pre",
         nargs="+",
@@ -126,7 +112,6 @@ def main():
     )
 
     args = parser.parse_args()
-
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
@@ -149,9 +134,7 @@ def main():
     # ---------------------------------------------------------
 
     stage_order = {"pre": 0, "post": 1}
-
     df["_stage_order"] = df["stage"].map(stage_order)
-
     df = (
         df
         .sort_values(["barcode", "condition", "_stage_order"])
@@ -163,14 +146,7 @@ def main():
     # ---------------------------------------------------------
 
     summary_file = outdir / "NanoPlot_summary.tsv"
-
-    df.to_csv(
-        summary_file,
-        sep="\t",
-        index=False,
-        float_format="%.2f"
-    )
-
+    df.to_csv(summary_file, sep="\t", index=False, float_format="%.2f")
     print(f"Summary written to: {summary_file}")
 
     # ---------------------------------------------------------
