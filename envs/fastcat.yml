@@ -1,10 +1,10 @@
-name: nanopore_nanoplot
+name: nanopore_fastcat
 
 channels:
   - conda-forge
   - nanoporetech
   - bioconda
   - defaults
-
+  
 dependencies:
-  - nanoplot
+  - fastcat

@@ -2,7 +2,9 @@ name: nanopore_pychopper
 
 channels:
   - conda-forge
+  - nanoporetech
   - bioconda
+  - defaults
 
 dependencies:
   - pychopper
