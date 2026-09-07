@@ -1,0 +1,9 @@
+name: nanopore_mapping
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - minimap2
+  - samtools

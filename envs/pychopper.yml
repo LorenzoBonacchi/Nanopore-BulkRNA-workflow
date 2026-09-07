@@ -1,0 +1,8 @@
+name: nanopore_pychopper
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - pychopper

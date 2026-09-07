@@ -6,7 +6,7 @@
 
  process runBambu {
     tag "Bambu_quantification"
-    conda "${projectDir}/envs/bambu_env.yml"
+    conda "${params.env_dir}/bambu.yml"
     cpus params.bambu_threads
 
     publishDir "${params.outdir}/bambu", mode: 'copy'

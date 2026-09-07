@@ -5,12 +5,7 @@
 
 process runMinimap2 {
     tag "${barcode}_${condition}"
-    // publishDir "${params.outdir}/minimap2",
-    //    mode: 'copy',
-    //    overwrite: true,
-    //    saveAs: { filename ->
-    //        "${barcode}_${condition}/${filename}"
-    //    }
+    conda "${params.env_dir}/mapping.yml"
 
     input:
     tuple val(barcode), val(condition), path(fastq)

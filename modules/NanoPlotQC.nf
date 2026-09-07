@@ -6,6 +6,8 @@
 
 process runNanoPlotQC_pre {
     tag "${barcode}_${condition}"
+    conda "${params.env_dir}/nanoplot.yml"
+    
     publishDir "${params.outdir}/nanoplot_pre",
         mode: 'copy',
         overwrite: true,
@@ -30,6 +32,7 @@ process runNanoPlotQC_pre {
 
 process runNanoPlotQC_post {
     tag "${barcode}_${condition}"
+    conda "${params.env_dir}/nanoplot.yml"
     publishDir "${params.outdir}/nanoplot_post",
         mode: 'copy',
         overwrite: true,

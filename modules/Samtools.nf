@@ -5,12 +5,7 @@
 
 process runSamtoBam {
     tag "${barcode}_${condition}"
-    // publishDir "${params.outdir}/sams",
-    //    mode: 'copy',
-    //    overwrite: true,
-    //    saveAs: { filename ->
-    //        "${barcode}_${condition}/${filename}"
-    //    }
+    conda "${params.env_dir}/mapping.yml"
 
     input:
     tuple val(barcode), val(condition), path(sam)
@@ -29,6 +24,8 @@ process runSamtoBam {
 
 
 process runSortBam {
+    conda "${params.env_dir}/mapping.yml"
+
     input:
     tuple val(barcode), val(condition), path(bam)
     output:
@@ -45,12 +42,14 @@ process runSortBam {
 
 process runBamIndex {
     tag "${barcode}_${condition}"
+    conda "${params.env_dir}/mapping.yml"
     publishDir "${params.outdir}/bams",
         mode: 'copy',
         overwrite: true,
         saveAs: { filename ->
             "${barcode}_${condition}/${filename}"
         }
+
     input:
     tuple val(barcode), val(condition), path(bam)
     output:

@@ -1,0 +1,8 @@
+name: nanopore_nanoplot
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - nanoplot

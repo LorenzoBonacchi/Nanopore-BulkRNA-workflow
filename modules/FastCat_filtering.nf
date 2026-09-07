@@ -6,12 +6,7 @@
 process runFastCat {
 
     tag "${barcode}_${condition}"
-    // publishDir "${params.outdir}/fastcat",
-    //    mode: 'copy',
-    //    overwrite: true,
-    //    saveAs: { filename ->
-    //        "${barcode}_${condition}/${filename}"
-    //    }
+    conda "${params.env_dir}/fastcat.yml"
 
     input:
     tuple val(barcode), val(condition), path(fastq)
