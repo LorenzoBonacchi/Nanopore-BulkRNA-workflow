@@ -21,6 +21,7 @@
 // Workflow
 // --------------------------------------------- //
 
+include { validateReferences } from './modules/ValidateReferences.nf'
 include { saveSoftwareVersions } from './modules/PipelineMetadata.nf'
 include { savePipelineParameters } from './modules/PipelineMetadata.nf'
 include { saveSamplesheet } from './modules/SaveSamplesheet.nf'
@@ -53,7 +54,11 @@ workflow {
         .view { barcode, condition, fastq_files -> "INPUT: ${barcode} | condition: ${condition} | FASTQ files: ${fastq_files.size()}"
         }
         .set { fastq_ch }   
- 
+    genome_ch = channel.fromPath(params.reference_genome, checkIfExists: true)
+    annotation_ch = channel.fromPath(params.annotation_file, checkIfExists: true)
+    checksum_ch = channel.fromPath("${baseDir}/references/checksum.sha256", checkIfExists: true)
+
+    validateReferences(genome_ch, annotation_ch, checksum_ch)
     runConcatenateFastq(fastq_ch)
     runNanoPlotQC_pre(runConcatenateFastq.out)
     runFastCat(runConcatenateFastq.out)
