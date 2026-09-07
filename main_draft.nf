@@ -20,6 +20,10 @@
 // --------------------------------------------- //
 // Workflow
 // --------------------------------------------- //
+
+include { saveSoftwareVersions } from './modules/PipelineMetadata.nf'
+include { savePipelineParameters } from './modules/PipelineMetadata.nf'
+include { saveSamplesheet } from './modules/SaveSamplesheet.nf'
 include { readSamplesheet } from './modules/ReadSamplesheet.nf'
 include { runConcatenateFastq } from './modules/ConcatenateFastq.nf'
 include { runNanoPlotQC_pre } from './modules/NanoPlotQC.nf'
@@ -35,6 +39,7 @@ include { runBambu } from './modules/Bambu.nf'
 
 workflow {
     samplesheet_ch = channel.fromPath(params.samplesheet)
+    saveSamplesheet(samplesheet_ch)
     readSamplesheet(samplesheet_ch)
     samplesheet_ch
         .splitCsv(header: true)
@@ -47,7 +52,7 @@ workflow {
         }
         .view { barcode, condition, fastq_files -> "INPUT: ${barcode} | condition: ${condition} | FASTQ files: ${fastq_files.size()}"
         }
-        .set { fastq_ch }
+        .set { fastq_ch }   
  
     runConcatenateFastq(fastq_ch)
     runNanoPlotQC_pre(runConcatenateFastq.out)
@@ -61,6 +66,8 @@ workflow {
     runBamIndex(runSortBam.out)
 	bam_ch = runBamIndex.out.map { barcode, condition, bam, bai -> bam }.collect()
     runBambu(bam_ch, file(params.reference_genome), file(params.annotation_file))
+    savePipelineParameters()
+    saveSoftwareVersions()
 }
 
 // CLI final command to run the workflow
